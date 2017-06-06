@@ -1,0 +1,1012 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 50 50 545 792
+%%Title: Enscript Output
+%%For: Patrick Muldoon
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Apr 26 20:24:15 2017
+%%Orientation: Portrait
+%%Pages: (atend)
+%%DocumentMedia: A4 595 842 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 10 10 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [595 842] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-simple 1.6 6
+
+/do_header {	% print default simple header
+  gsave
+    d_header_x d_header_y HFpt_h 3 div add translate
+
+    HF setfont
+    user_header_p {
+      5 0 moveto user_header_left_str show
+
+      d_header_w user_header_center_str stringwidth pop sub 2 div
+      0 moveto user_header_center_str show
+
+      d_header_w user_header_right_str stringwidth pop sub 5 sub
+      0 moveto user_header_right_str show
+    } {
+      5 0 moveto fname show
+      45 0 rmoveto fmodstr show
+      45 0 rmoveto pagenumstr show
+    } ifelse
+
+  grestore
+} def
+%%EndResource
+/d_page_w 495 def
+/d_page_h 742 def
+/d_header_x 0 def
+/d_header_y 727 def
+/d_header_w 495 def
+/d_header_h 15 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 495 def
+/d_footer_h 0 def
+/d_output_w 495 def
+/d_output_h 727 def
+/cols 1 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+50 50 translate
+/pagenum 1 def
+/fname (RegexStartUp.cpp) def
+/fdir (.) def
+/ftail (RegexStartUp.cpp) def
+% User defined strings:
+/fmodstr (Wed Apr 26 20:07:12 2017) def
+/pagenumstr (1) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+30 714 M (1:) s
+48 714 M
+(// Copyright 2017 Patrick Muldoon) s
+30 703 M (2:) s
+48 703 M
+(#include <vector>) s
+30 692 M (3:) s
+48 692 M
+(#include <iostream>) s
+30 681 M (4:) s
+48 681 M
+(#include <fstream>) s
+30 670 M (5:) s
+48 670 M
+(#include <string>) s
+30 659 M (6:) s
+48 659 M
+(#include "intouch.hpp") s
+30 648 M (7:) s
+30 637 M (8:) s
+48 637 M
+(int main\(int argc, char* argv[]\) {) s
+30 626 M (9:) s
+48 626 M
+(        if\(argc != 2\) {) s
+24 615 M (10:) s
+48 615 M
+(                throw std::runtime_error\("Wrong number of arguments."\);) s
+24 604 M (11:) s
+48 604 M
+(                std::cout << "Usage " << argv[0] << "logfile" << std::end) s
+5 593 M
+(l;) s
+24 582 M (12:) s
+48 582 M
+(                exit\(1\);) s
+24 571 M (13:) s
+48 571 M
+(        }) s
+24 560 M (14:) s
+48 560 M
+(        std::string logfile = argv[1];) s
+24 549 M (15:) s
+24 538 M (16:) s
+48 538 M
+(        std::ifstream fin;) s
+24 527 M (17:) s
+48 527 M
+(        fin.open\(logfile\);) s
+24 516 M (18:) s
+48 516 M
+(        if\(fin.fail\(\)\) {) s
+24 505 M (19:) s
+48 505 M
+(                std::cerr << "Error opening file " << logfile << std::end) s
+5 494 M
+(l;) s
+24 483 M (20:) s
+48 483 M
+(                exit\(1\);) s
+24 472 M (21:) s
+48 472 M
+(        }) s
+24 461 M (22:) s
+24 450 M (23:) s
+48 450 M
+(        std::string outfile\(argv[1]\);) s
+24 439 M (24:) s
+48 439 M
+(        outfile += ".rpt";) s
+24 428 M (25:) s
+48 428 M
+(        std::ofstream fout;) s
+24 417 M (26:) s
+48 417 M
+(        fout.open\(outfile.c_str\(\)\);) s
+24 406 M (27:) s
+48 406 M
+(        if\(fout.fail\(\)\) {) s
+24 395 M (28:) s
+48 395 M
+(                std::cerr << "Error opening output file" << outfile << st) s
+5 384 M
+(d::endl;) s
+24 373 M (29:) s
+48 373 M
+(                exit\(1\);) s
+24 362 M (30:) s
+48 362 M
+(        }) s
+24 351 M (31:) s
+24 340 M (32:) s
+48 340 M
+(        unsigned int lines_scanned = 0, boots_started = 0, boots_finished) s
+5 329 M
+( = 0;) s
+24 318 M (33:) s
+48 318 M
+(        unsigned int services_started = 0, services_completed = 0;) s
+24 307 M (34:) s
+48 307 M
+(        int count = 0, counter = 0;) s
+24 296 M (35:) s
+48 296 M
+(        std::string line;) s
+24 285 M (36:) s
+48 285 M
+(        std::vector<Intouch> bootups;) s
+24 274 M (37:) s
+48 274 M
+(        std::vector<Softload> softloads;) s
+24 263 M (38:) s
+48 263 M
+(        int size = 0;) s
+24 252 M (39:) s
+24 241 M (40:) s
+48 241 M
+(        while\(std::getline\(fin, line\)\) {) s
+24 230 M (41:) s
+48 230 M
+(                ++lines_scanned;) s
+24 219 M (42:) s
+48 219 M
+(                if\(regex_match\(line, StartRegex\)\) {) s
+24 208 M (43:) s
+48 208 M
+(                        ++boots_started;) s
+24 197 M (44:) s
+48 197 M
+(                        Intouch it\(line, logfile, lines_scanned\);) s
+24 186 M (45:) s
+48 186 M
+(                        bootups.push_back\(it\);  ) s
+24 175 M (46:) s
+48 175 M
+(                        while\(std::getline\(fin, line\) && count == 0\){   ) s
+24 164 M (47:) s
+48 164 M
+(                                ++lines_scanned;) s
+24 153 M (48:) s
+48 153 M
+(                                if\(regex_match\(line, StartRegex\)\){) s
+24 142 M (49:) s
+48 142 M
+(                                        ++boots_started;) s
+24 131 M (50:) s
+48 131 M
+(                                        Intouch its\(line, logfile, lines_) s
+5 120 M
+(scanned\);) s
+24 109 M (51:) s
+48 109 M
+(                                        bootups.push_back\(its\);) s
+24 98 M (52:) s
+48 98 M
+(                                }else if\(regex_match\(line, ServiceStart\)\)) s
+5 87 M
+({) s
+24 76 M (53:) s
+48 76 M
+(                                        ++services_started;) s
+24 65 M (54:) s
+48 65 M
+(                                        Services s\(line, logfile, lines_s) s
+5 54 M
+(canned\);) s
+24 43 M (55:) s
+48 43 M
+(                                        bootups.back\(\).a.push_back\(s\);) s
+24 32 M (56:) s
+48 32 M
+(                                }else if\(regex_match\(line, ServiceSuccess) s
+5 21 M
+(\)\){) s
+24 10 M (57:) s
+48 10 M
+(                                        ++services_completed;) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+50 50 translate
+/pagenum 2 def
+/fname (RegexStartUp.cpp) def
+/fdir (.) def
+/ftail (RegexStartUp.cpp) def
+% User defined strings:
+/fmodstr (Wed Apr 26 20:07:12 2017) def
+/pagenumstr (2) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+24 714 M (58:) s
+48 714 M
+(                                        std::string compare;) s
+24 703 M (59:) s
+48 703 M
+(                                        boost::smatch sm;) s
+24 692 M (60:) s
+48 692 M
+(                                        boost::regex_match\(line, sm, Serv) s
+5 681 M
+(iceSuccess\);) s
+24 670 M (61:) s
+48 670 M
+(                                        compare = sm[1];) s
+24 659 M (62:) s
+48 659 M
+(                                        for\(int i = 0; i < bootups.back\(\)) s
+5 648 M
+(.a.size\(\); ++i\){) s
+24 637 M (63:) s
+48 637 M
+(                                                if\(bootups.back\(\).a[i].ge) s
+5 626 M
+(tServiceName\(\) == compare\){) s
+24 615 M (64:) s
+48 615 M
+(                                                        bootups.back\(\).a.) s
+5 604 M
+(at\(i\).ServiceBoot\(line, lines_scanned\);) s
+24 593 M (65:) s
+48 593 M
+(                                                }) s
+24 582 M (66:) s
+48 582 M
+(                                        }) s
+24 571 M (67:) s
+48 571 M
+(                                }else if\(regex_match\(line, SucceededRegex) s
+5 560 M
+(\)\) {) s
+24 549 M (68:) s
+48 549 M
+(                                        ++boots_finished;) s
+24 538 M (69:) s
+48 538 M
+(                                        bootups.back\(\).BootSuccess\(line, ) s
+5 527 M
+(lines_scanned\);) s
+24 516 M (70:) s
+48 516 M
+(                                        ++lines_scanned;) s
+24 505 M (71:) s
+48 505 M
+(                                        count++;) s
+24 494 M (72:) s
+48 494 M
+(                                        services_started = 24;) s
+24 483 M (73:) s
+48 483 M
+(                                        services_completed =24;) s
+24 472 M (74:) s
+48 472 M
+(                                }) s
+24 461 M (75:) s
+48 461 M
+(                        }) s
+24 450 M (76:) s
+48 450 M
+(                }else if\(regex_match\(line, SucceededRegex\)\) {) s
+24 439 M (77:) s
+48 439 M
+(                                        ++boots_finished;) s
+24 428 M (78:) s
+48 428 M
+(                                        bootups.back\(\).BootSuccess\(line, ) s
+5 417 M
+(lines_scanned\);) s
+24 406 M (79:) s
+48 406 M
+(                                        ++lines_scanned;) s
+24 395 M (80:) s
+48 395 M
+(                                        count++;) s
+24 384 M (81:) s
+48 384 M
+(                } else if\(regex_match\(line, SoftLoadBegin\)\){) s
+24 373 M (82:) s
+48 373 M
+(                        std::cout << "softload start\\n";) s
+24 362 M (83:) s
+48 362 M
+(                        Softload soft\(line, logfile, lines_scanned\);) s
+24 351 M (84:) s
+48 351 M
+(                        softloads.push_back\(soft\);) s
+24 340 M (85:) s
+48 340 M
+(                        while\(softloads.back\(\).getSuccess\(\) == false\){) s
+24 329 M (86:) s
+48 329 M
+(                                std::getline\(fin, line\);) s
+24 318 M (87:) s
+48 318 M
+(                                ++lines_scanned;) s
+24 307 M (88:) s
+48 307 M
+(                                if\(regex_match\(line, Original\)\){) s
+24 296 M (89:) s
+48 296 M
+(                                        softloads.back\(\).Originalver\(line) s
+5 285 M
+(\);) s
+24 274 M (90:) s
+48 274 M
+(                                } else if\(regex_match\(line, New\)\){) s
+24 263 M (91:) s
+48 263 M
+(                                        softloads.back\(\).Newver\(line\);) s
+24 252 M (92:) s
+48 252 M
+(                                } else if\(regex_match\(line, SoftLoadEnd\)\)) s
+5 241 M
+({) s
+24 230 M (93:) s
+48 230 M
+(                                        softloads.back\(\).SoftloadSuccess\() s
+5 219 M
+(line, lines_scanned\);) s
+24 208 M (94:) s
+48 208 M
+(                                        counter++;) s
+24 197 M (95:) s
+48 197 M
+(                                } ) s
+24 186 M (96:) s
+48 186 M
+(                        }) s
+24 175 M (97:) s
+48 175 M
+(                }) s
+24 164 M (98:) s
+24 153 M (99:) s
+48 153 M
+(                count = 0;) s
+18 142 M (100:) s
+48 142 M
+(        }) s
+18 131 M (101:) s
+48 131 M
+(        std::cout << "here\\n";) s
+18 120 M (102:) s
+48 120 M
+(        for\(unsigned int j = 0; j < bootups.size\(\)-1; ++j\) {) s
+18 109 M (103:) s
+48 109 M
+(                fout << bootups[j] << std::endl;) s
+18 98 M (104:) s
+48 98 M
+(                fout << "Services" << std::endl;) s
+18 87 M (105:) s
+48 87 M
+(                if\(bootups[j].a.empty\(\)\){) s
+18 76 M (106:) s
+48 76 M
+(                        std::cout << "no services\\n";) s
+18 65 M (107:) s
+48 65 M
+(                        fout << "There is no services due to an incomplet) s
+5 54 M
+(e boot\\n";) s
+18 43 M (108:) s
+48 43 M
+(                }) s
+18 32 M (109:) s
+48 32 M
+(                else{) s
+18 21 M (110:) s
+48 21 M
+(                        for\(unsigned int i = 0; i < bootups[j].a.size\(\); ) s
+5 10 M
+(++i\){) s
+_R
+S
+%%Page: (3) 3
+%%BeginPageSetup
+_S
+50 50 translate
+/pagenum 3 def
+/fname (RegexStartUp.cpp) def
+/fdir (.) def
+/ftail (RegexStartUp.cpp) def
+% User defined strings:
+/fmodstr (Wed Apr 26 20:07:12 2017) def
+/pagenumstr (3) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+18 714 M (111:) s
+48 714 M
+(                                fout << bootups[j].a[i];) s
+18 703 M (112:) s
+48 703 M
+(                        }) s
+18 692 M (113:) s
+48 692 M
+(                ) s
+18 681 M (114:) s
+48 681 M
+(                        fout << "\\t*** Services not successfully started:) s
+5 670 M
+( ";) s
+18 659 M (115:) s
+48 659 M
+(                        for\(unsigned int i = 0; i < bootups[j].a.size\(\)-1) s
+5 648 M
+(; ++i\){) s
+18 637 M (116:) s
+48 637 M
+(                                if\(bootups[j].a[i].getSuccess\(\) == false\)) s
+5 626 M
+({) s
+18 615 M (117:) s
+48 615 M
+(                                        fout << bootups[j].a[i].getServic) s
+5 604 M
+(eName\(\);) s
+18 593 M (118:) s
+48 593 M
+(                                }) s
+18 582 M (119:) s
+48 582 M
+(                        }) s
+18 571 M (120:) s
+48 571 M
+(                }) s
+18 560 M (121:) s
+48 560 M
+(                if\(size < counter\){) s
+18 549 M (122:) s
+48 549 M
+(                        if\(bootups[j].getEndLine\(\) < softloads.at\(size\).g) s
+5 538 M
+(etStartLine\(\)\){) s
+18 527 M (123:) s
+48 527 M
+(                                fout << std::endl;) s
+18 516 M (124:) s
+48 516 M
+(                                fout << "=== Softload ===" << std::endl;) s
+18 505 M (125:) s
+48 505 M
+(                                fout << softloads.at\(size\).getStartLine\(\)) s
+5 494 M
+( << "\(" << softloads.at\(size\).getFileName\(\) ) s
+18 483 M (126:) s
+48 483 M
+(                                << "\)" << " : " << softloads.at\(size\).get) s
+5 472 M
+(StartTime\(\) << " Softload Start" << std::endl;) s
+18 461 M (127:) s
+48 461 M
+(                                fout << "\\tOriginal Version ==> " << soft) s
+5 450 M
+(loads.at\(size\).getOriginal\(\) << std::endl;) s
+18 439 M (128:) s
+48 439 M
+(                                fout << "\\tNew Version ==> " << softloads) s
+5 428 M
+(.at\(size\).getNew\(\) << std::endl;) s
+18 417 M (129:) s
+48 417 M
+(                                fout << "\\tElapsed Time ==> " << std::end) s
+5 406 M
+(l;) s
+18 395 M (130:) s
+48 395 M
+(                                fout << softloads.at\(size\).getEndLine\(\) <) s
+5 384 M
+(< "\(" << softloads.at\(size\).getFileName\(\) ) s
+18 373 M (131:) s
+48 373 M
+(                                << "\)" << " : " << softloads.at\(size\).get) s
+5 362 M
+(EndTime\(\) << "Softload Completed" << std::endl; ) s
+18 351 M (132:) s
+48 351 M
+(                                size++;) s
+18 340 M (133:) s
+48 340 M
+(                        }) s
+18 329 M (134:) s
+48 329 M
+(                }) s
+18 318 M (135:) s
+48 318 M
+(                fout << std::endl;) s
+18 307 M (136:) s
+48 307 M
+(        }) s
+18 296 M (137:) s
+48 296 M
+(        fout << bootups[bootups.size\(\) - 1] << std::endl;) s
+18 285 M (138:) s
+48 285 M
+(        fout << "Services" << std::endl;) s
+18 274 M (139:) s
+48 274 M
+(        for\(unsigned int i = 0; i < bootups[bootups.size\(\) -1].a.size\(\); ) s
+5 263 M
+(++i\){) s
+18 252 M (140:) s
+48 252 M
+(                fout << bootups[bootups.size\(\)-1].a[i];) s
+18 241 M (141:) s
+48 241 M
+(        }) s
+18 230 M (142:) s
+48 230 M
+(        fout << "\\t*** Services not successfully started: ";) s
+18 219 M (143:) s
+48 219 M
+(        for\(unsigned int i = 0; i < bootups[bootups.size\(\)-1].a.size\(\); +) s
+5 208 M
+(+i\){) s
+18 197 M (144:) s
+48 197 M
+(                if\(bootups[bootups.size\(\)-1].a[i].getSuccess\(\) == false\){) s
+18 186 M (145:) s
+48 186 M
+(                        fout << bootups[bootups.size\(\)-1].a[i].getService) s
+5 175 M
+(Name\(\);) s
+18 164 M (146:) s
+48 164 M
+(                }) s
+18 153 M (147:) s
+48 153 M
+(        }) s
+18 142 M (148:) s
+48 142 M
+(        fin.close\(\);) s
+18 131 M (149:) s
+48 131 M
+(        fout.close\(\);) s
+18 120 M (150:) s
+48 120 M
+(}) s
+_R
+S
+%%Trailer
+%%Pages: 3
+%%DocumentNeededResources: font Courier-Bold Courier 
+%%EOF
